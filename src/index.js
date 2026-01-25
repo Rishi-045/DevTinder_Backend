@@ -32,6 +32,7 @@ app.patch("/user", async (req, res) => {
     const { userId } = req.body;
     const updatedData = await User.findByIdAndUpdate(userId, req.body, {
       returnDocument: "after",
+      runValidators: true,
     });
     if (!updatedData) {
       res.status(404).send("User not found.");
@@ -45,6 +46,7 @@ app.patch("/user", async (req, res) => {
     console.log(err);
     return res.status(500).json({
       message: "Internal Server Error",
+      error: err.message,
     });
   }
 });
@@ -100,6 +102,7 @@ app.post("/signup", async (req, res) => {
     console.log(err);
     return res.status(500).json({
       message: "Internal Server Error",
+      error: err.message,
     });
   }
 });
