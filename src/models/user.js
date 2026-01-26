@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const validator = require("validator")
 
 const userSchema = new Schema(
   {
@@ -15,6 +16,7 @@ const userSchema = new Schema(
       minLength: 1,
       trim: true,
       maxLength: 50,
+      required : true,
     },
     email: {
       type: String,
@@ -34,16 +36,12 @@ const userSchema = new Schema(
       required: true,
       trim: true,
       min: 6,
-      max: 12,
-      validate: {
-        validator: function (value) {
-          return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,12}$/.test(
-            value,
-          );
+      validate : {
+        validator : (value)=>{
+          return validator.isStrongPassword(value);
         },
-        message:
-          "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character",
-      },
+        message : "Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character"
+      }
     },
     age: {
       type: Number,
@@ -60,6 +58,12 @@ const userSchema = new Schema(
       type: String,
       default:
         "https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png",
+      validate: {
+        validator: function (value) {
+          return validator.isURL(value);
+        },
+        message: "Please enter a valid URL",
+      },
     },
     about: {
       type: String,
