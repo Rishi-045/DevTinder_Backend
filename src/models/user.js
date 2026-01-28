@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const validator = require("validator")
+const validator = require("validator");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const userSchema = new Schema(
   {
@@ -16,7 +18,7 @@ const userSchema = new Schema(
       minLength: 1,
       trim: true,
       maxLength: 50,
-      required : true,
+      required: true,
     },
     email: {
       type: String,
@@ -36,12 +38,13 @@ const userSchema = new Schema(
       required: true,
       trim: true,
       min: 6,
-      validate : {
-        validator : (value)=>{
+      validate: {
+        validator: (value) => {
           return validator.isStrongPassword(value);
         },
-        message : "Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character"
-      }
+        message:
+          "Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character",
+      },
     },
     age: {
       type: Number,
@@ -84,6 +87,23 @@ const userSchema = new Schema(
     timestamps: true,
   },
 );
+
+// Schema methods
+
+userSchema.methods.verifyJwt = async function () {
+  console.log(this);
+  const token = jwt.sign({ id: this._id }, process.env.SIGNATURE, {
+    expiresIn: "1d",
+  });
+  console.log(token);
+  return token;
+};
+
+userSchema.methods.verifyPassword = async function (password) {
+  const passwordHash = this.password;
+  const isPasswordValid = await bcrypt.compare(password, passwordHash);
+  return isPasswordValid;
+};
 
 const User = mongoose.model("User", userSchema);
 
