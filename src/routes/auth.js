@@ -1,6 +1,6 @@
 const express = require("express");
 const User = require("../models/user");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
 
 const authRoutes = express.Router();
 
@@ -25,7 +25,6 @@ authRoutes.post("/signup", async (req, res) => {
   }
 });
 
-
 authRoutes.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -49,8 +48,11 @@ authRoutes.post("/login", async (req, res) => {
         message: "Invalid Credentials",
       });
     }
-    const token = await isUserExist.verifyJwt()
-    res.cookie("token", token,{expires: new Date(Date.now() + 24 * 60 * 60 * 1000),httpOnly: true});
+    const token = await isUserExist.verifyJwt();
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      httpOnly: true,
+    });
     return res.status(200).json({
       message: "Logged in successfully",
     });
@@ -62,7 +64,6 @@ authRoutes.post("/login", async (req, res) => {
     });
   }
 });
-
 
 authRoutes.post("/logout", async (req, res) => {
   try {
