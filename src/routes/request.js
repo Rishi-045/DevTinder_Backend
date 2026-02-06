@@ -1,14 +1,73 @@
 const express = require("express");
 const authMiddleware = require("../middlewares/authMiddleware");
+const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 const requestRoutes = express.Router();
 
+requestRoutes.post(
+  "/request/send/:status/:toUserId",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const fromUserId = req?.user?._id;
+      const toUserId = req?.params?.toUserId;
+      const status = req?.params?.status;
 
-requestRoutes.post("/sendConnectionRequest",authMiddleware,(req,res)=>{
-const user = req.user;
-res.send({
-    message : `Connection request sent by ${user?.firstName}`
-})
-})
+      const connectionRequest = new ConnectionRequest({
+        fromUserId,
+        toUserId,
+        status,
+      });
 
+      const ALLOWED_STATUS = ["interested", "ignored"];
+      if (!ALLOWED_STATUS.includes(status)) {
+        return res.status(400).json({
+          message: `Invalid status value : ${status}.`,
+        });
+      }
 
-module.exports = requestRoutes
+      const isUserExist = await User.findById(toUserId);
+      if (!isUserExist) {
+        return res.status(400).json({
+          messsage: "User not found.",
+        });
+      }
+
+      const existingConnectionRequest = await ConnectionRequest.findOne({
+        $or: [
+          {
+            fromUserId,
+            toUserId,
+          },
+          {
+            fromUserId: toUserId,
+            toUserId: fromUserId,
+          },
+        ],
+      });
+
+      if (existingConnectionRequest) {
+        return res.status(400).json({
+          message: "Connection request already exists.",
+        });
+      }
+
+      const data = await connectionRequest.save();
+      res.json({
+        message:
+          status == "ignored"
+            ? "Request ignored successfully"
+            : "Request sent successfully",
+        data,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error: err.message,
+      });
+    }
+  },
+);
+
+module.exports = requestRoutes;
