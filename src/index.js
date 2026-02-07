@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const app = express();
+const cors = require("cors");
 const cookieParser = require("cookie-parser")
 require("dotenv").config();
 app.use(express.json());
@@ -9,7 +10,10 @@ const authRoutes = require("./routes/auth")
 const profileRoutes = require("./routes/profile")
 const requestRoutes = require("./routes/request")
 
-
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+}))
 app.use("/",authRoutes)
 app.use("/",profileRoutes);
 app.use("/",requestRoutes);
