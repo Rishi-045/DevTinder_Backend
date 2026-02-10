@@ -15,7 +15,14 @@ authRoutes.post("/signup", async (req, res) => {
       password: passwordHash,
     });
     const data = await user.save();
-    res.send("User created successfully");
+    res.json({
+      message: "User registered successfully",
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+      },
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({
@@ -57,7 +64,7 @@ authRoutes.post("/login", async (req, res) => {
     });
     return res.status(200).json({
       message: "Logged in successfully",
-      data : isUserExist
+      data: isUserExist,
     });
   } catch (err) {
     console.log(err);

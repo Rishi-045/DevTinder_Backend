@@ -8,7 +8,8 @@ app.use(express.json());
 app.use(cookieParser());
 const authRoutes = require("./routes/auth")
 const profileRoutes = require("./routes/profile")
-const requestRoutes = require("./routes/request")
+const requestRoutes = require("./routes/request");
+const userRoute = require("./routes/user");
 
 app.use(cors({
   origin: process.env.CLIENT_URL,
@@ -17,6 +18,7 @@ app.use(cors({
 app.use("/",authRoutes)
 app.use("/",profileRoutes);
 app.use("/",requestRoutes);
+app.use("/",userRoute)
 
 connectDB()
   .then(() => {

@@ -23,7 +23,7 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: [true, "Email already exists"],
       trim: true,
       lowercase: true,
       validate: {

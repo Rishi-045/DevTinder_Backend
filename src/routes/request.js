@@ -70,4 +70,51 @@ requestRoutes.post(
   },
 );
 
+requestRoutes.post(
+  "/request/review/:status/:requestId",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const { user: loggedInUser } = req;
+      const { status, requestId } = req.params;
+
+      const ALLOWED_STATUS = ["accepted", "rejected"];
+      if (!ALLOWED_STATUS.includes(status)) {
+        return res.status(400).json({
+          message: `Invalid status value : ${status}.`,
+        });
+      }
+
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser?._id,
+        status: "interested",
+      });
+
+      if (!connectionRequest) {
+        return res.status(404).json({
+          message: "Connection request not found.",
+        });
+      }
+
+      connectionRequest.status = status;
+      await connectionRequest.save();
+
+      return res.json({
+        message:
+          status == "accepted"
+            ? "Connection request accepted successfully"
+            : "Connection request rejected successfully",
+        data: connectionRequest,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error: err.message,
+      });
+    }
+  },
+);
+
 module.exports = requestRoutes;
