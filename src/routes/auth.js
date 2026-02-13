@@ -43,7 +43,9 @@ authRoutes.post("/login", async (req, res) => {
     }
 
     //check in the db user exist or not
-    const isUserExist = await User.findOne({ email: email });
+    const isUserExist = await User.findOne({ email: email }).select(
+      "+password",
+    );
     if (!isUserExist) {
       return res.status(401).json({
         message: "Invalid Credentials",
@@ -55,6 +57,10 @@ authRoutes.post("/login", async (req, res) => {
         message: "Invalid Credentials",
       });
     }
+
+    //to remove password from the response
+    isUserExist.password = undefined;
+
     const token = await isUserExist.verifyJwt();
     res.cookie("token", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -77,7 +83,7 @@ authRoutes.post("/login", async (req, res) => {
 
 authRoutes.post("/logout", async (req, res) => {
   try {
-    res.clearCookie("token", { httpOnly: true });
+    res.clearCookie("token", { httpOnly: true, sameSite: "lax", secure: false });
     return res.status(200).json({
       message: "Logged out successfully",
     });

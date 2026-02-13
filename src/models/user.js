@@ -37,6 +37,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      select: false,
       min: 6,
       validate: {
         validator: (value) => {
@@ -91,11 +92,9 @@ const userSchema = new Schema(
 // Schema methods
 
 userSchema.methods.verifyJwt = async function () {
-  console.log(this);
   const token = jwt.sign({ id: this._id }, process.env.SIGNATURE, {
     expiresIn: "1d",
   });
-  console.log(token);
   return token;
 };
 
