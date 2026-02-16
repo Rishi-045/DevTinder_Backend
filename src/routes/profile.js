@@ -20,7 +20,7 @@ profileRouter.get("/profile", authMiddleware, async (req, res) => {
   }
 });
 
-profileRouter.post("/profile", authMiddleware, async (req, res) => {
+profileRouter.patch("/profile", authMiddleware, async (req, res) => {
   try {
     const isUpdateAllowed = validateEditProfileData(req);
     if (!isUpdateAllowed) {

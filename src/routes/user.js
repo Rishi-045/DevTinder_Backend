@@ -4,7 +4,7 @@ const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
 const userRoute = express.Router();
 
-const userFields = "firstName lastName email age gender skills about";
+const userFields = "firstName lastName email age gender skills about photoUrl";
 
 userRoute.get("/user/requests", authMiddleware, async (req, res) => {
   try {
@@ -85,7 +85,6 @@ userRoute.get("/feed", authMiddleware, async (req, res) => {
         { _id: { $ne: loggedInUser._id } },
       ],
     })
-      .select(userFields)
       .skip(skip)
       .limit(limit);
 

@@ -8,7 +8,7 @@ const authMiddleware = async (req, res, next) => {
     const { token } = req.cookies;
     if (!token) {
       return res.status(401).json({
-        message: "Token not found",
+        message: "Authentication token is missing",
       });
     }
     const istokenValid = validator.isJWT(token);
