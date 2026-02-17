@@ -15,10 +15,11 @@ userRoute.get("/user/requests", authMiddleware, async (req, res) => {
     }).populate("fromUserId", userFields);
 
     res.status(200).json({
-      requests:
-        connectionRequests.length == 0
-          ? "No Connection Request"
-          : connectionRequests,
+      message:
+        connectionRequests.length === 0
+          ? "No Connection Requests"
+          : "Connection Requests Fetched Successfully.",
+      requests: connectionRequests,
     });
   } catch (err) {
     return res.status(500).json({
