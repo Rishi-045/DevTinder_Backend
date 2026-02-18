@@ -83,6 +83,12 @@ const userSchema = new Schema(
         message: "Skills must be less than or equal to 10",
       },
     },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
