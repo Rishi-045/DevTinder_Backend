@@ -10,7 +10,7 @@ const authRoutes = require("./routes/auth")
 const profileRoutes = require("./routes/profile")
 const requestRoutes = require("./routes/request");
 const userRoute = require("./routes/user");
-
+const scheduleCronJob = require("./utils/cronJob");
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true,
@@ -19,6 +19,8 @@ app.use("/",authRoutes)
 app.use("/",profileRoutes);
 app.use("/",requestRoutes);
 app.use("/",userRoute)
+
+scheduleCronJob.start();
 
 connectDB()
   .then(() => {

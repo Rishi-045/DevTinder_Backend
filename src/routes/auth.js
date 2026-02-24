@@ -2,7 +2,8 @@ const express = require("express");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const sendEmail = require("../utils/sendEmail");
+const sendEmail = require("../services/sendEmail");
+const { htmlTemplate } = require("../utils/templates/htmlTemplate");
 
 const authRoutes = express.Router();
 
@@ -123,7 +124,11 @@ authRoutes.post("/forgot-password", async (req, res) => {
 
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
     console.log(resetUrl, user?.email);
-    await sendEmail(user?.email, user?.firstName, resetUrl);
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset Request",
+      html: htmlTemplate(resetUrl, user.firstName),
+    });
     res.json({
       message: "Reset link sent to email.",
     });
@@ -148,7 +153,7 @@ authRoutes.post("/reset-password/:token", async (req, res) => {
       resetPasswordExpires: { $gt: Date.now() },
     });
 
-    if(!user) {
+    if (!user) {
       return res.status(400).json({
         message: "Invalid or expired token",
       });

@@ -1,8 +1,6 @@
 const nodemailer = require("nodemailer");
-const { htmlTemplate } = require("./htmlTemplate");
 
-const sendEmail = async (to, name, resetUrl) => {
-  console.log(to, name, resetUrl);
+const sendEmail = async ({to, subject, html}) => {
   console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -15,8 +13,8 @@ const sendEmail = async (to, name, resetUrl) => {
   await transporter.sendMail({
     from: `DevTinder <${process.env.EMAIL_USER}>`,
     to,
-    subject: "Password Reset Request",
-    html: htmlTemplate(resetUrl, name),
+    subject,
+    html
   });
 };
 
