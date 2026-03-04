@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require("./config/database");
 const app = express();
 const cors = require("cors");
+const http = require("http");
 const cookieParser = require("cookie-parser")
 require("dotenv").config();
 app.use(express.json());
@@ -11,6 +12,8 @@ const profileRoutes = require("./routes/profile")
 const requestRoutes = require("./routes/request");
 const userRoute = require("./routes/user");
 const scheduleCronJob = require("./utils/cronJob");
+const initializeSocket = require("./config/socket");
+const chatRouter = require("./routes/chat");
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true,
@@ -19,13 +22,23 @@ app.use("/",authRoutes)
 app.use("/",profileRoutes);
 app.use("/",requestRoutes);
 app.use("/",userRoute)
+app.use("/",chatRouter)
+// create http server
+const server = http.createServer(app);
 
+// attach soket.io
+initializeSocket(server);
+
+
+// schedule cron job
 scheduleCronJob.start();
+
+
 
 connectDB()
   .then(() => {
     console.log("Database Connection Established...");
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log(`Server is running on port ${process.env.PORT}`);
     });
   })
