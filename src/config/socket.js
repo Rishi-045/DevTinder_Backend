@@ -2,6 +2,8 @@ const { Server } = require("socket.io");
 const Chat = require("../models/messages");
 const ConnectionRequest = require("../models/connectionRequest");
 
+const onlineUsers = new Map();
+
 function initializeSocket(server) {
   const io = new Server(server, {
     cors: {
@@ -13,15 +15,25 @@ function initializeSocket(server) {
   io.on("connection", (socket) => {
     console.log("User Connected : ", socket.id);
 
+    const userId = socket.handshake.query.userId;
+    console.log(userId);
+    console.log(onlineUsers);
+    //store online user
+    if (userId) {
+      onlineUsers.set(userId, socket.id);
+    }
+
+    // join chat room
     socket.on("joinChat", ({ currentUserId, toUserId }) => {
       const roomId = [currentUserId, toUserId].sort().join("_");
       socket.join(roomId);
       console.log("User Joined Chat : ", roomId);
     });
 
+    // send Messages
     socket.on(
       "sendMessage",
-      async ({ currentUserId, toUserId, message, image }) => {
+      async ({ currentUserId, toUserId, message, image, senderName }) => {
         try {
           const roomId = [currentUserId, toUserId].sort().join("_");
 
@@ -66,14 +78,29 @@ function initializeSocket(server) {
             message,
             image,
           });
+
+          console.log("Online Users:", onlineUsers);
+          console.log("Receiver socket:", onlineUsers.get(toUserId));
+
+          // send notification
+          const receiverSocketId = onlineUsers.get(toUserId);
+
+          if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newNotification", {
+              type: "MESSAGE",
+              message: `${senderName} sent you a message`,
+              fromUserId: currentUserId,
+            });
+          }
         } catch (err) {
           console.error("Error sending message: ", err);
         }
       },
     );
 
-    socket.on("disconnected", () => {
+    socket.on("disconnect", () => {
       console.log("User Disconnected : ", socket.id);
+      onlineUsers.delete(userId);
     });
   });
 }
