@@ -6,6 +6,8 @@ const sendEmail = require("../services/sendEmail");
 const { htmlTemplate } = require("../utils/templates/htmlTemplate");
 
 const authRoutes = express.Router();
+const isProduction = process.env.NODE_ENV === "production";
+
 
 authRoutes.post("/signup", async (req, res) => {
   try {
@@ -68,8 +70,8 @@ authRoutes.post("/login", async (req, res) => {
     res.cookie("token", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       httpOnly: true,
-      sameSite: "lax", // REQUIRED
-      secure: false, // MUST be false on localhost
+      sameSite: isProduction ? "None" : "Lax", // REQUIRED
+      secure: isProduction ? true : false, // MUST be true in production
     });
     return res.status(200).json({
       message: "Logged in successfully",
