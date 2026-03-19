@@ -15,7 +15,8 @@ const scheduleCronJob = require("./utils/cronJob");
 const initializeSocket = require("./config/socket");
 const chatRouter = require("./routes/chat");
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: [process.env.CLIENT_URL,
+"https://dev-tinder-orcin.vercel.app"],
   credentials: true,
 }))
 app.use("/",authRoutes)
