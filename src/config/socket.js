@@ -7,7 +7,7 @@ const onlineUsers = new Map();
 function initializeSocket(server) {
   const io = new Server(server, {
     cors: {
-      origin: [process.env.CLIENT_URL,"https://devtinder-connect.netlify.app"],
+      origin: [process.env.CLIENT_URL,"https://devtinder-connect.netlify.app", "https://devtinder-connect.netlify.app"],
       methods: ["GET", "POST"],
       credentials: true,
     },
