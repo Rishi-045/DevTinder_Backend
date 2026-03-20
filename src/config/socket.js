@@ -7,14 +7,13 @@ const onlineUsers = new Map();
 function initializeSocket(server) {
   const io = new Server(server, {
     cors: {
-      origin: [process.env.CLIENT_URL],
+      origin: [process.env.CLIENT_URL,"https://devtinder-connect.netlify.app"],
       methods: ["GET", "POST"],
       credentials: true,
     },
   });
 
   console.log(process.env.CLIENT_URL);
-  console.log("https://dev-tinder-orcin.vercel.app");
 
   io.on("connection", (socket) => {
     console.log("User Connected : ", socket.id);
